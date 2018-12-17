@@ -8,6 +8,6 @@
         "drupal/drupal-extension": "^3.4"
     },
     "autoload": {
-        "psr-4": {"DigitalServices\\": "src/"}
+        "psr-4": {"OrdinaDigitalServices\\": "src/"}
     }
 }
