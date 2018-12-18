@@ -1,5 +1,7 @@
 <?php
 
+namespace OrdinaDigitalServices;
+
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\EntityInterface;
