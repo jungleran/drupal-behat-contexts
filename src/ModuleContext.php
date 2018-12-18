@@ -11,8 +11,6 @@ use Drupal\DrupalExtension\Context\DrupalContext;
  * Class ModuleContext.
  *
  * Provides steps to verify the state of modules.
- *
- * @package DigitalServices
  */
 class ModuleContext implements Context {
 

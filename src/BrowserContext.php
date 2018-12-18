@@ -11,8 +11,6 @@ use Drupal\DrupalExtension\Context\MinkContext;
  * Class BrowserContext.
  *
  * Provides browser specific implementations.
- *
- * @package DigitalServices
  */
 class BrowserContext implements Context {
 
