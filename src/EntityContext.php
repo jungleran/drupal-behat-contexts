@@ -1,5 +1,7 @@
 <?php
 
+namespace OrdinaDigitalServices;
+
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\EntityInterface;
@@ -37,8 +39,7 @@ class EntityContext extends RawDrupalContext {
    * @throws \RuntimeException
    */
   public function findEntityWithFieldValue(string $entityType, string $fieldName, $fieldValue): int {
-    $entityStorage = \Drupal::entityTypeManager()->getStorage($entityType);
-    $query = $entityStorage->getQuery();
+    $query = \Drupal::entityTypeManager()->getStorage($entityType)->getQuery();
     $query->condition($fieldName, $fieldValue);
     $ids = $query->execute();
 
@@ -48,6 +49,41 @@ class EntityContext extends RawDrupalContext {
 
     if (\count($ids) > 1) {
       throw new \RuntimeException("Found multiple {$entityType}s with field '{$fieldName}' containing '{$fieldValue}'");
+    }
+
+    return \end($ids);
+  }
+
+  /**
+   * Find an entity with a given combination of field values.
+   *
+   * @param string $entityType
+   *   The type of entity.
+   * @param array $fieldValues
+   *   The field values to look for, keyed by their field names.
+   *
+   * @return int
+   *   The entity id.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function findEntityWithFieldValues(string $entityType, array $fieldValues): int {
+    $query = \Drupal::entityTypeManager()->getStorage($entityType)->getQuery();
+    $formattedFieldValues = '';
+    foreach ($fieldValues as $fieldName => $fieldValue) {
+      $query->condition($fieldName, $fieldValue);
+      $formattedFieldValues .= "$fieldName: $fieldValue \n";
+    }
+    $ids = $query->execute();
+
+
+    if (empty($ids)) {
+      throw new \RuntimeException("No {$entityType} exists with the following combination of field values: \n{$formattedFieldValues}");
+    }
+
+    if (count($ids) > 1) {
+      throw new \RuntimeException("Multiple {$entityType}s exist with the following combination of field values: \n{$formattedFieldValues}");
     }
 
     return \end($ids);
