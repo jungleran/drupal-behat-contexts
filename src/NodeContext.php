@@ -6,11 +6,9 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Session;
-use DateTime;
 use DateTimeZone;
 use Drupal\DrupalExtension\Context\MinkContext;
 use Drupal\node\Entity\Node;
-use http\Exception\RuntimeException;
 use stdClass;
 
 /**
@@ -93,21 +91,18 @@ class NodeContext implements Context {
    *
    * @return \Drupal\node\Entity\Node
    *
-   * @throws \RuntimeException
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function createNode(stdClass $values): Node {
     if (!isset($values->title)) {
       throw new \InvalidArgumentException('Nodes require a title');
     }
 
-    try {
-      $nid = $this->entityContext->createEntity('node', $values);
-      /** @var \Drupal\node\Entity\Node $node */
-      $node = $this->entityContext->entityLoad('node', $nid);
-    }
-    catch (\Exception $e) {
-      throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
-    }
+    $nid = $this->entityContext->createEntity('node', $values);
+    /** @var \Drupal\node\Entity\Node $node */
+    $node = $this->entityContext->entityLoad('node', $nid);
 
     if ($node === NULL) {
       throw new \RuntimeException("{$values->title} could not be created");
@@ -122,7 +117,9 @@ class NodeContext implements Context {
    * @param string $type
    * @param \Behat\Gherkin\Node\TableNode $nodesTable
    *
-   * @throws \RuntimeException
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function singleContentWithUpCastDate(string $type, TableNode $nodesTable): void {
     foreach ($nodesTable->getHash() as $nodeHash) {
@@ -139,7 +136,9 @@ class NodeContext implements Context {
    * @param string $contentType
    * @param \Behat\Gherkin\Node\TableNode $nodesTable
    *
-   * @throws \RuntimeException
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function multipleContentWithUpCastDate(int $amount, string $contentType, TableNode $nodesTable): void {
     foreach ($nodesTable->getHash() as $nodeHash) {
