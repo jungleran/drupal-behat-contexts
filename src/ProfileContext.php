@@ -26,8 +26,10 @@ class ProfileContext implements Context {
 
   /**
    * @BeforeScenario
+   *
+   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
    */
-  public function gatherContexts(BeforeScenarioScope $scope) {
+  public function gatherContexts(BeforeScenarioScope $scope): void {
     $environment = $scope->getEnvironment();
 
     $this->entityContext = $environment->getContext(EntityContext::class);
@@ -45,7 +47,8 @@ class ProfileContext implements Context {
    * @param string $type
    * @param \Behat\Gherkin\Node\TableNode $profilesTable
    *
-   * @throws \Exception
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function createProfiles(string $type, TableNode $profilesTable): void {
     foreach ($profilesTable->getHash() as $hash) {
@@ -53,7 +56,12 @@ class ProfileContext implements Context {
         throw new \InvalidArgumentException('No user provided');
       }
 
-      $user = $this->drupalContext->getUserManager()->getUser($hash['user']);
+      try {
+        $user = $this->drupalContext->getUserManager()->getUser($hash['user']);
+      }
+      catch (\Exception $e) {
+        throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
+      }
       unset($hash['user']);
       $hash['uid'] = $user->uid;
       $hash['type'] = $type;

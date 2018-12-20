@@ -100,12 +100,13 @@ class EntityContext extends RawDrupalContext {
    * @return int
    *   Identifier of the entity created.
    *
-   * @throws \Exception
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function createEntity(string $entityType, \stdClass $entityData): int {
     $definition = \Drupal::entityTypeManager()->getDefinition($entityType, FALSE);
     if ($definition === NULL) {
-      throw new \Exception(sprintf('%s is not a valid Entity type.', $entityType));
+      throw new \RuntimeException("{$entityType} is not a valid Entity type.");
     }
 
     if ($entityType === 'node') {
@@ -159,13 +160,18 @@ class EntityContext extends RawDrupalContext {
    * @return int
    *   The id of the created entity.
    *
-   * @throws \Exception
+   * @throws \RuntimeException
    */
   private function createGenericEntity(string $entityType, \stdClass $entityData): int {
-    $this->parseEntityFields($entityType, $entityData);
-    $entity = $this->getDriver()->createEntity($entityType, $entityData);
-    $this->entities[$entityType][] = $entity;
-    return $entity->id();
+    try {
+      $this->parseEntityFields($entityType, $entityData);
+      $entity = $this->getDriver()->createEntity($entityType, $entityData);
+      $this->entities[$entityType][] = $entity;
+      return $entity->id();
+    }
+    catch (\Exception $e) {
+      throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
+    }
   }
 
   /**
