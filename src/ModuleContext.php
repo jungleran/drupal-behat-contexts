@@ -15,25 +15,9 @@ use Drupal\DrupalExtension\Context\DrupalContext;
 class ModuleContext implements Context {
 
   /**
-   * The Drupal Context.
-   *
-   * @var \Drupal\DrupalExtension\Context\DrupalContext
-   */
-  private $drupalContext;
-
-  /**
-   * @beforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   *
-   * @throws \Exception
-   */
-  public function gatherContexts(BeforeScenarioScope $scope) {
-    $this->drupalContext = $scope->getEnvironment()->getContext(DrupalContext::class);
-  }
-
-  /**
    * @Then the following modules are disabled:
+   *
+   * @param \Behat\Gherkin\Node\TableNode $table
    */
   public function theFollowingModulesAreDisabled(TableNode $table): void {
     $columns = $table->getColumnsHash();
@@ -43,7 +27,7 @@ class ModuleContext implements Context {
       }
 
       if (\Drupal::moduleHandler()->moduleExists($collection['module'])) {
-        throw new \RuntimeException(sprintf('Module %s is enabled while it should not be', $collection['module']));
+        throw new \RuntimeException("Module '{$collection['module']}' is enabled while it should not be");
       }
     }
   }

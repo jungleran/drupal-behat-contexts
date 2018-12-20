@@ -15,21 +15,7 @@ use Drupal\DrupalExtension\Context\MinkContext;
  */
 class MetaTagContext implements Context {
 
-  /**
-   * @var \Drupal\DrupalExtension\Context\MinkContext
-   */
-  private $minkContext;
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $environment = $scope->getEnvironment();
-
-    $this->minkContext = $environment->getContext(MinkContext::class);
-  }
+  use UsesMink;
 
   /**
    * @Then there should be a meta-tag with a :attribute attribute containing :value
@@ -76,14 +62,7 @@ class MetaTagContext implements Context {
    * @return \Behat\Mink\Element\NodeElement[]
    */
   private function getMetaTags(): array {
-    return $this->getSession()->getPage()->findAll('css', 'meta');
-  }
-
-  /**
-   * @return \Behat\Mink\Session
-   */
-  private function getSession(): Session {
-    return $this->minkContext->getSession();
+    return $this->getPage()->findAll('css', 'meta');
   }
 
   /**

@@ -17,24 +17,7 @@ use Behat\Mink\Element\NodeElement;
  */
 class ElementContext implements Context {
 
-  /**
-   * MinkContext.
-   *
-   * @var \Drupal\DrupalExtension\Context\MinkContext
-   */
-  private $minkContext;
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    /** @var \Behat\Behat\Context\Environment\InitializedContextEnvironment $environment */
-    $environment = $scope->getEnvironment();
-
-    $this->minkContext = $environment->getContext(MinkContext::class);
-  }
+  use UsesMink;
 
   /**
    * @Then I should see the :locator element :expectedCount time(s)
@@ -46,7 +29,7 @@ class ElementContext implements Context {
    * @throws \RuntimeException
    */
   public function iShouldSeeTheElementTime(string $locator, int $expectedCount): void {
-    $elements = $this->minkContext->getSession()->getPage()->findAll('css', $locator);
+    $elements = $this->getPage()->findAll('css', $locator);
 
     $actual = \count($elements);
     if ($actual !== $expectedCount) {
@@ -65,7 +48,7 @@ class ElementContext implements Context {
    * @throws \RuntimeException
    */
   public function iShouldSeeRegexInTheElementTime(string $regex, string $locator, int $expectedCount): void {
-    $elements = $this->minkContext->getSession()->getPage()->findAll('css', $locator);
+    $elements = $this->getPage()->findAll('css', $locator);
 
     $total = 0;
     /** @var \Behat\Mink\Element\NodeElement $element */
@@ -91,10 +74,9 @@ class ElementContext implements Context {
   public function iShouldNotSeeOutsideOfTheElement(string $text, string $locator): void {
     $this->minkContext->assertElementContainsText($locator, $text);
 
-    $page = $this->minkContext->getSession()->getPage();
-    $html = $page->getHtml();
-
+    $page = $this->getPage();
     $elements = $page->findAll('css', $locator);
+    $html = $page->getHtml();
     /** @var \Behat\Mink\Element\NodeElement $element */
     foreach ($elements as $element) {
       $html = \str_replace($element->getOuterHtml(), '', $html);
@@ -121,8 +103,7 @@ class ElementContext implements Context {
    * @throws \RuntimeException
    */
   public function assertPageHasElementWithAttributeContainingValue(string $locator, string $attributeName, string $attributeValue): void {
-    $page = $this->minkContext->getSession()->getPage();
-    $element = $page->find('css', $locator);
+    $element = $this->getPage()->find('css', $locator);
     if (empty($element)) {
       throw new \RuntimeException("Could not find element using the selector '{$locator}'");
     }
@@ -165,8 +146,7 @@ class ElementContext implements Context {
     $buttonObj = $elementObj->findButton($label);
 
     if ($buttonObj === NULL) {
-      $url = $this->minkContext->getSession()->getCurrentUrl();
-      throw new \RuntimeException("The button '{$label}' was not found in the '{$locator}' element on the page {$url}");
+      throw new \RuntimeException("The button '{$label}' was not found in the '{$locator}' element on the page {$this->getCurrentUrl()}");
     }
 
     $elementObj->pressButton($label);
@@ -183,11 +163,10 @@ class ElementContext implements Context {
    * @throws \RuntimeException
    */
   public function findElement(string $locator): NodeElement {
-    $session = $this->minkContext->getSession();
-    $elementObj = $session->getPage()->find('css', $locator);
+    $elementObj = $this->getPage()->find('css', $locator);
 
     if (empty($elementObj)) {
-      throw new \RuntimeException("No element with '{$locator}' could be found.");
+      throw new \RuntimeException("No element with '{$locator}' could be found on the page {$this->getCurrentUrl()}");
     }
 
     return $elementObj;
@@ -214,7 +193,7 @@ class ElementContext implements Context {
    * @throws \RuntimeException
    */
   public function iShouldNotSeeTheElement(string $locator): void {
-    $nodeElements = $this->minkContext->getSession()->getPage()->findAll('css', $locator);
+    $nodeElements = $this->getPage()->findAll('css', $locator);
 
     if (empty($nodeElements)) {
       return;
@@ -261,9 +240,7 @@ class ElementContext implements Context {
    */
   private function countElementsContainingText(string $locator, string $text): int {
     /** @var \Behat\Mink\Element\NodeElement[] $items */
-    $items = $this->minkContext->getSession()
-      ->getPage()
-      ->findAll('css', $locator);
+    $items = $this->getPage()->findAll('css', $locator);
 
     $timesFound = 0;
     foreach ($items as $item) {
