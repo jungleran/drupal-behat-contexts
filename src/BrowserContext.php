@@ -88,6 +88,15 @@ class BrowserContext implements Context {
   }
 
   /**
+   * @Given I wait :seconds second(s)
+   *
+   * @param int|float $seconds
+   */
+  public function iWaitMilliseconds($seconds): void {
+    usleep($seconds * 1000000);
+  }
+
+  /**
    * @Given I switch to the :locator iframe
    *
    * @param string $locator
