@@ -71,4 +71,21 @@ JS;
     $this->getSession()->getDriver()->switchToIFrame();
   }
 
+  /**
+   * @Then I should be at :path
+   * @Then I should be on the :path path
+   *
+   * @param string $path
+   *
+   * @throws \RuntimeException
+   */
+  public function iShouldBeAt(string $path): void {
+    $baseUrl = \trim($this->minkContext->getMinkParameter('base_url'), '/');
+    $path = \trim($path, '/');
+    $expectedUrl = $baseUrl . '/' . $path;
+    if ($expectedUrl !== $this->getSession()->getCurrentUrl()) {
+      throw new \RuntimeException("You're not at {$expectedUrl}, but at " . $this->getSession()->getCurrentUrl());
+    }
+  }
+
 }
