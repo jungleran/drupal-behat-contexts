@@ -9,5 +9,8 @@
     },
     "autoload": {
         "psr-4": {"OrdinaDigitalServices\\": "src/"}
+    },
+    "suggest": {
+        "drupal/entityqueue": "Enables the use of the EntityQueueContext"
     }
 }
