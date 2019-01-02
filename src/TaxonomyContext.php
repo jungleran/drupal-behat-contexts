@@ -14,10 +14,7 @@ use Drupal\taxonomy\Entity\Term;
  */
 class TaxonomyContext implements Context {
 
-  /**
-   * @var \OrdinaDigitalServices\EntityContext
-   */
-  private $entityContext;
+  use UsesEntities;
 
   /**
    * @var \Drupal\DrupalExtension\Context\DrupalContext
@@ -33,7 +30,6 @@ class TaxonomyContext implements Context {
     /** @var \Behat\Behat\Context\Environment\InitializedContextEnvironment $environment */
     $environment = $scope->getEnvironment();
 
-    $this->entityContext = $environment->getContext(EntityContext::class);
     $this->drupalContext = $environment->getContext(DrupalContext::class);
   }
 

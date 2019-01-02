@@ -14,10 +14,7 @@ use Drupal\DrupalExtension\Context\DrupalContext;
  */
 class ProfileContext implements Context {
 
-  /**
-   * @var \OrdinaDigitalServices\EntityContext
-   */
-  private $entityContext;
+  use UsesEntities;
 
   /**
    * @var \Drupal\DrupalExtension\Context\DrupalContext
@@ -28,10 +25,7 @@ class ProfileContext implements Context {
    * @BeforeScenario
    */
   public function gatherContexts(BeforeScenarioScope $scope) {
-    $environment = $scope->getEnvironment();
-
-    $this->entityContext = $environment->getContext(EntityContext::class);
-    $this->drupalContext = $environment->getContext(DrupalContext::class);
+    $this->drupalContext = $scope->getEnvironment()->getContext(DrupalContext::class);
   }
 
   /**

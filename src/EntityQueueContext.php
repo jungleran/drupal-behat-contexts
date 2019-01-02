@@ -4,7 +4,6 @@ namespace OrdinaDigitalServices;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeFeatureScope;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Drupal\entityqueue\Entity\EntityQueue;
 use Drupal\entityqueue\EntityQueueInterface;
 
@@ -15,10 +14,7 @@ use Drupal\entityqueue\EntityQueueInterface;
  */
 class EntityQueueContext implements Context {
 
-  /**
-   * @var \OrdinaDigitalServices\EntityContext
-   */
-  private $entityContext;
+  use UsesEntities;
 
   /**
    * @beforeFeature
@@ -29,17 +25,6 @@ class EntityQueueContext implements Context {
     if (!\Drupal::moduleHandler()->moduleExists('entityqueue')) {
       throw new \RuntimeException(self::class . 'does not work without the entity queue module');
     }
-  }
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $environment = $scope->getEnvironment();
-
-    $this->entityContext = $environment->getContext(EntityContext::class);
   }
 
   /**
