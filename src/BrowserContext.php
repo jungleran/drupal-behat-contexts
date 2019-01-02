@@ -90,10 +90,10 @@ class BrowserContext implements Context {
   /**
    * @Given I wait :seconds second(s)
    *
-   * @param int|float $seconds
+   * @param int $seconds
    */
-  public function iWaitMilliseconds($seconds): void {
-    usleep($seconds * 1000000);
+  public function iWaitSeconds(int $seconds): void {
+    \sleep($seconds);
   }
 
   /**
