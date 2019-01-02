@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: chrisjansen
- * Date: 02-01-19
- * Time: 09:06
- */
 
 namespace OrdinaDigitalServices;
 
