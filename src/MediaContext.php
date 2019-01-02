@@ -3,7 +3,6 @@
 namespace OrdinaDigitalServices;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
 /**
@@ -13,21 +12,7 @@ use Behat\Gherkin\Node\TableNode;
  */
 class MediaContext implements Context {
 
-  /**
-   * @var \OrdinaDigitalServices\EntityContext
-   */
-  private $entityContext;
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $environment = $scope->getEnvironment();
-
-    $this->entityContext = $environment->getContext(EntityContext::class);
-  }
+  use UsesEntities;
 
   /**
    * @Given :type media:

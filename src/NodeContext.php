@@ -18,27 +18,8 @@ use stdClass;
  */
 class NodeContext implements Context {
 
-  /**
-   * @var \OrdinaDigitalServices\EntityContext
-   */
-  private $entityContext;
-
-  /**
-   * @var \Drupal\DrupalExtension\Context\MinkContext
-   */
-  private $minkContext;
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $environment = $scope->getEnvironment();
-
-    $this->entityContext = $environment->getContext(EntityContext::class);
-    $this->minkContext = $environment->getContext(MinkContext::class);
-  }
+  use UsesEntities;
+  use UsesMink;
 
   /**
    * @When the title of node :originalTitle has been changed to :newTitle
@@ -192,13 +173,6 @@ class NodeContext implements Context {
   public function iEditContent(string $title): void {
     $node = $this->loadNodeByTitle($title);
     $this->minkContext->visit($this->minkContext->locatePath('/node/' . $node->id() . '/edit'));
-  }
-
-  /**
-   * @return \Behat\Mink\Session
-   */
-  private function getSession(): Session {
-    return $this->minkContext->getSession();
   }
 
 }

@@ -15,10 +15,7 @@ use Drupal\DrupalExtension\Context\MinkContext;
  */
 class BrowserContext implements Context {
 
-  /**
-   * @var MinkContext
-   */
-  private $minkContext;
+  use UsesMink;
 
   /**
    * @var int
@@ -56,21 +53,12 @@ class BrowserContext implements Context {
    *
    * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
    */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $this->minkContext = $scope->getEnvironment()->getContext(MinkContext::class);
-  }
-
-  /**
-   * @beforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
   public function resetWindowSize(BeforeScenarioScope $scope): void {
     if (!$this->resizeOnScenarioStart) {
       return;
     }
 
-    if (!$this->minkContext->getSession()->getDriver() instanceof Selenium2Driver) {
+    if (!$this->getSession()->getDriver() instanceof Selenium2Driver) {
       return;
     }
 
@@ -84,7 +72,7 @@ class BrowserContext implements Context {
    * @param int $height
    */
   public function resizeWindow(int $width, int $height): void {
-    $this->minkContext->getSession()->resizeWindow($width, $height, 'current');
+    $this->getSession()->resizeWindow($width, $height, 'current');
   }
 
   /**
@@ -94,49 +82,6 @@ class BrowserContext implements Context {
    */
   public function iWaitSeconds(int $seconds): void {
     \sleep($seconds);
-  }
-
-  /**
-   * @Given I switch to the :locator iframe
-   *
-   * @param string $locator
-   *   Selector for the iframe.
-   *
-   * @throws \Exception
-   */
-  public function switchToIframe(string $locator): void {
-    $function = <<<JS
-      (function(){
-         let iframe = document.querySelector("$locator");
-         iframe.name = "iframeToSwitchTo";
-      })()
-JS;
-
-    try {
-      $this->getSession()->executeScript($function);
-    }
-    catch (\Exception $e) {
-      throw new \RuntimeException(sprintf('Could not locate iframe %s', $locator));
-    }
-
-    $this->getSession()->getDriver()->switchToIFrame('iframeToSwitchTo');
-  }
-
-  /**
-   * @return \Behat\Mink\Session
-   */
-  private function getSession(): Session {
-    return $this->minkContext->getSession();
-  }
-
-  /**
-   * @When I switch back from the iframe
-   * @When I am not switched to any iframe
-   *
-   * @throws \Exception
-   */
-  public function switchToMainFrame(): void {
-    $this->getSession()->getDriver()->switchToIFrame();
   }
 
   /**

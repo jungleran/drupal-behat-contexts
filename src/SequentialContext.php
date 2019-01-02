@@ -14,31 +14,14 @@ use Drupal\DrupalExtension\Context\MinkContext;
  */
 class SequentialContext implements Context {
 
-  /**
-   * @var \Drupal\DrupalExtension\Context\MinkContext
-   */
-  private $minkContext;
-
-  /**
-   * @beforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   *
-   * @throws \Exception
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $this->minkContext = $scope->getEnvironment()->getContext(MinkContext::class);
-  }
+  use UsesMink;
 
   /**
    * @Then heading :headingBefore should directly precede :tag heading :headingAfter
    *
    * @param string $headingBefore
-   *   Text before.
    * @param string $tag
-   *   Tag.
    * @param string $headingAfter
-   *   Text after.
    *
    * @throws \RuntimeException
    */
@@ -49,7 +32,7 @@ class SequentialContext implements Context {
     }
 
     /** @var \Behat\Mink\Element\NodeElement[] $headingElements */
-    $headingElements = $this->getSession()->getPage()->findAll('css', \implode(', ', $validTags));
+    $headingElements = $this->getPage()->findAll('css', \implode(', ', $validTags));
     foreach ($headingElements as $index => $headingElement) {
       if ($headingElement->getText() !== $headingBefore) {
         continue;
@@ -69,13 +52,6 @@ class SequentialContext implements Context {
   }
 
   /**
-   * @return \Behat\Mink\Session
-   */
-  private function getSession(): Session {
-    return $this->minkContext->getSession();
-  }
-
-  /**
    * @Then heading :headingBefore should precede heading :headingAfter
    *
    * @param string $headingBefore
@@ -83,7 +59,7 @@ class SequentialContext implements Context {
    */
   public function headingShouldPrecede(string $headingBefore, string $headingAfter): void {
     /** @var \Behat\Mink\Element\NodeElement[] $headingElements */
-    $headingElements = $this->getSession()->getPage()->findAll('css', 'h1, h2, h3, h4, h5, h6');
+    $headingElements = $this->getPage()->findAll('css', 'h1, h2, h3, h4, h5, h6');
 
     $firstIndex = $secondIndex = null;
     foreach ($headingElements as $index => $headingElement) {
@@ -127,7 +103,7 @@ class SequentialContext implements Context {
    * @throws \RuntimeException
    */
   public function textShouldPrecedeText(string $textBefore, string $textAfter): void {
-    $pageText = $this->getSession()->getPage()->getHtml();
+    $pageText = $this->getPage()->getHtml();
 
     $firstPosition = \strpos($pageText, $textBefore);
     if ($firstPosition === FALSE) {

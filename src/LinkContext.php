@@ -16,19 +16,7 @@ use Drupal\DrupalExtension\Context\MinkContext;
  */
 class LinkContext implements Context {
 
-  /**
-   * @var \Drupal\DrupalExtension\Context\MinkContext
-   */
-  private $minkContext;
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $this->minkContext = $scope->getEnvironment()->getContext(MinkContext::class);
-  }
+  use UsesMink;
 
   /**
    * @Then I should see a link :label with url :url
@@ -40,10 +28,10 @@ class LinkContext implements Context {
    */
   public function assertLinkWithUrl(string $label, string $url): void {
     /** @var \Behat\Mink\Element\NodeElement[] $links */
-    $links = $this->getSession()->getPage()->findAll('named', array('link', $label));
+    $links = $this->getPage()->findAll('named', array('link', $label));
 
     if (empty($links)) {
-      throw new \RuntimeException("No link '{$label}' found on " . $this->getSession()->getCurrentUrl());
+      throw new \RuntimeException("No link '{$label}' found on " . $this->getCurrentUrl());
     }
 
     $invisibleLinkFound = FALSE;
@@ -72,13 +60,6 @@ class LinkContext implements Context {
       throw new \RuntimeException("Found a '{$label}' link with url {$url}, but it was invisible.");
     }
     throw new \RuntimeException("Found multiple '{$label}' links, but none with the url {$url}");
-  }
-
-  /**
-   * @return \Behat\Mink\Session
-   */
-  private function getSession(): Session {
-    return $this->minkContext->getSession();
   }
 
   /**
@@ -111,7 +92,7 @@ class LinkContext implements Context {
    */
   public function assertClickableInElement(string $label, string $locator): void {
     $session = $this->getSession();
-    $elements = $session->getPage()->findAll('css', $locator);
+    $elements = $this->getPage()->findAll('css', $locator);
 
     if (empty($elements)) {
       throw new ElementNotFoundException($session, null, 'css', $locator);
@@ -126,7 +107,7 @@ class LinkContext implements Context {
       }
     }
 
-    throw new \RuntimeException(sprintf('No link %s could be found', $label));
+    throw new \RuntimeException("No link {$label} could be found");
   }
 
 }

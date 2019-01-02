@@ -14,19 +14,7 @@ use Drupal\DrupalExtension\Context\MinkContext;
  */
 class FormContext implements Context {
 
-  /**
-   * @var \Drupal\DrupalExtension\Context\MinkContext
-   */
-  private $minkContext;
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $this->minkContext = $scope->getEnvironment()->getContext(MinkContext::class);
-  }
+  use UsesMink;
 
   /**
    * @Given I empty the :locator field
@@ -36,7 +24,7 @@ class FormContext implements Context {
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function iEmptyTheField(string $locator): void {
-    $this->minkContext->getSession()->getPage()->fillField($locator, '');
+    $this->getPage()->fillField($locator, '');
   }
 
   /**
@@ -78,7 +66,7 @@ class FormContext implements Context {
    */
   private function findCheckbox(string $label): NodeElement {
     /** @var \Behat\Mink\Element\NodeElement[] $fields */
-    $fields = $this->minkContext->getSession()->getPage()->findAll('named', array('field', $label));
+    $fields = $this->getPage()->findAll('named', array('field', $label));
 
     foreach ($fields as $field) {
       if (!$field->hasAttribute('type')) {

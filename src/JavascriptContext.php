@@ -3,11 +3,8 @@
 namespace OrdinaDigitalServices;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Session;
-use Drupal\DrupalExtension\Context\MinkContext;
 
 /**
  * Class JavascriptContext.
@@ -16,24 +13,7 @@ use Drupal\DrupalExtension\Context\MinkContext;
  */
 final class JavascriptContext implements Context {
 
-  /**
-   * MinkContext.
-   *
-   * @var \Drupal\DrupalExtension\Context\MinkContext
-   */
-  private $minkContext;
-
-  /**
-   * {@inheritdoc}
-   *
-   * @BeforeScenario
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    /** @var \Behat\Behat\Context\Environment\InitializedContextEnvironment $environment */
-    $environment = $scope->getEnvironment();
-
-    $this->minkContext = $environment->getContext(MinkContext::class);
-  }
+  use UsesMink;
 
   /**
    * @When for WYSIWYG field :name I enter :value
@@ -42,7 +22,7 @@ final class JavascriptContext implements Context {
    * @param string $value
    */
   public function forWysiwygEnter(string $name, string $value): void {
-    $field = $this->getSession()->getPage()->findField($name);
+    $field = $this->getPage()->findField($name);
 
     if ($field === NULL) {
       throw new \RuntimeException("Could not find CKEditor with locator: {$name}");
@@ -64,18 +44,10 @@ final class JavascriptContext implements Context {
   }
 
   /**
-   * @return \Behat\Mink\Session
-   */
-  private function getSession(): Session {
-    return $this->minkContext->getSession();
-  }
-
-  /**
    * @param string $script
    */
   private function executeScript(string $script): void {
-    $this->getSession()
-      ->executeScript($script);
+    $this->getSession()->executeScript($script);
   }
 
   /**
@@ -91,15 +63,14 @@ final class JavascriptContext implements Context {
    * @throws \RuntimeException
    */
   public function iExpandTheDropButtonInTheRow($label): void {
-    $page = $this->getSession()->getPage();
-
-    $dropButton = $this->findTableRow($page, $label)->find('css', '.dropbutton-toggle button');
+    $row = $this->findTableRow($this->getPage(), $label);
+    $dropButton = $row->find('css', '.dropbutton-toggle button');
     if ($dropButton) {
       $dropButton->click();
       return;
     }
 
-    throw new \RuntimeException("Found a row containing '{$label}', but no dropbutton on page {$this->getSession()->getCurrentUrl()}");
+    throw new \RuntimeException("Found a row containing '{$label}', but no dropbutton on page {$this->getCurrentUrl()}");
   }
 
   /**
@@ -116,7 +87,7 @@ final class JavascriptContext implements Context {
   public function findTableRow(ElementInterface $element, string $search): NodeElement {
     $rows = $element->findAll('css', 'tr');
     if (empty($rows)) {
-      throw new \RuntimeException("No rows found on page {$this->getSession()->getCurrentUrl()}");
+      throw new \RuntimeException("No rows found on page {$this->getCurrentUrl()}");
     }
 
     $foundRows = [];
@@ -127,11 +98,11 @@ final class JavascriptContext implements Context {
     }
 
     if (empty($foundRows)) {
-      throw new \RuntimeException("Failed to find a row containing '{$search}' on page {$this->getSession()->getCurrentUrl()}");
+      throw new \RuntimeException("Failed to find a row containing '{$search}' on page {$this->getCurrentUrl()}");
     }
 
     if (\count($foundRows) > 1) {
-      throw new \RuntimeException("Found multiple rows containing '{$search}' on page {$this->getSession()->getCurrentUrl()}");
+      throw new \RuntimeException("Found multiple rows containing '{$search}' on page {$this->getCurrentUrl()}");
     }
 
     return \reset($foundRows);
@@ -160,7 +131,7 @@ JS;
    */
   public function locatorShouldHaveFocus(string $locator): void {
     /** @var \Behat\Mink\Element\NodeElement[] $elements */
-    $elements = $this->getSession()->getPage()->findAll('css', $locator);
+    $elements = $this->getPage()->findAll('css', $locator);
 
     if (empty($elements)) {
       throw new \RuntimeException("No element with css locator '{$locator}' could be found");
@@ -188,6 +159,42 @@ JS;
   public function iScrollToIntoView(string $locator): void {
     $script = "document.querySelector('{$locator}').scrollIntoView()";
     $this->executeScript($script);
+  }
+
+  /**
+   * @Given I switch to the :locator iframe
+   *
+   * @param string $locator
+   *   Selector for the iframe.
+   *
+   * @throws \Exception
+   */
+  public function switchToIframe(string $locator): void {
+    $function = <<<JS
+      (function(){
+         let iframe = document.querySelector("$locator");
+         iframe.name = "iframeToSwitchTo";
+      })()
+JS;
+
+    try {
+      $this->getSession()->executeScript($function);
+    }
+    catch (\Exception $e) {
+      throw new \RuntimeException("Could not locate iframe {$locator} on page {$this->getCurrentUrl()}");
+    }
+
+    $this->getSession()->getDriver()->switchToIFrame('iframeToSwitchTo');
+  }
+
+  /**
+   * @When I switch back from the iframe
+   * @When I am not switched to any iframe
+   *
+   * @throws \Exception
+   */
+  public function switchToMainFrame(): void {
+    $this->getSession()->getDriver()->switchToIFrame();
   }
 
 }

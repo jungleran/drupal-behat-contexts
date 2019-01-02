@@ -3,9 +3,7 @@
 namespace OrdinaDigitalServices;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
-use Drupal\DrupalExtension\Context\DrupalContext;
 
 /**
  * Class ProfileContext.
@@ -14,27 +12,8 @@ use Drupal\DrupalExtension\Context\DrupalContext;
  */
 class ProfileContext implements Context {
 
-  /**
-   * @var \OrdinaDigitalServices\EntityContext
-   */
-  private $entityContext;
-
-  /**
-   * @var \Drupal\DrupalExtension\Context\DrupalContext
-   */
-  private $drupalContext;
-
-  /**
-   * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
-   */
-  public function gatherContexts(BeforeScenarioScope $scope): void {
-    $environment = $scope->getEnvironment();
-
-    $this->entityContext = $environment->getContext(EntityContext::class);
-    $this->drupalContext = $environment->getContext(DrupalContext::class);
-  }
+  use UsesEntities;
+  use UsesDrupal;
 
   /**
    * Creates profiles of a given type provided in the form:
