@@ -165,9 +165,10 @@ class EntityContext extends RawDrupalContext {
   private function createGenericEntity(string $entityType, \stdClass $entityData): int {
     try {
       $this->parseEntityFields($entityType, $entityData);
+      /** @var \StdClass $entity */
       $entity = $this->getDriver()->createEntity($entityType, $entityData);
       $this->entities[$entityType][] = $entity;
-      return $entity->id();
+      return $entity->id;
     }
     catch (\Exception $e) {
       throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
