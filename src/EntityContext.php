@@ -4,6 +4,7 @@ namespace OrdinaDigitalServices;
 
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
 
@@ -207,4 +208,33 @@ class EntityContext extends RawDrupalContext {
     return \Drupal::entityTypeManager()->getStorage($entityType)->load($entityId);
   }
 
+
+  /**
+   * @Given :entityType :uuid has label :label
+   *
+   * @param string $entityType
+   *   The entity type.
+   * @param string $uuid
+   *   The entity's uuid.
+   * @param string $label
+   *   The label to set.
+   *
+   * @throws \RuntimeException
+   */
+  public function entityTypeWithUuidHasLabel(string $entityType, string $uuid, string $label): void {
+    $entityStorage = \Drupal::entityTypeManager()->getStorage($entityType);
+    $entities = $entityStorage->loadByProperties(['uuid' => $uuid]);
+    if (empty($entities)) {
+      throw new \RuntimeException("No {$entityType} with uuid {$uuid} could be found");
+    }
+
+    $entity = reset($entities);
+    if (!$entity instanceof ContentEntityInterface) {
+      throw new \RuntimeException("{$entityType} with uuid {$uuid} can not have a label");
+    }
+
+    $labelKey = $entity->getEntityType()->getKey('label');
+    $entity->set($labelKey, $label);
+    $entity->save();
+  }
 }
