@@ -208,7 +208,6 @@ class EntityContext extends RawDrupalContext {
     return \Drupal::entityTypeManager()->getStorage($entityType)->load($entityId);
   }
 
-
   /**
    * @Given :entityType :uuid has label :label
    *
@@ -222,13 +221,7 @@ class EntityContext extends RawDrupalContext {
    * @throws \RuntimeException
    */
   public function entityTypeWithUuidHasLabel(string $entityType, string $uuid, string $label): void {
-    $entityStorage = \Drupal::entityTypeManager()->getStorage($entityType);
-    $entities = $entityStorage->loadByProperties(['uuid' => $uuid]);
-    if (empty($entities)) {
-      throw new \RuntimeException("No {$entityType} with uuid {$uuid} could be found");
-    }
-
-    $entity = reset($entities);
+    $entity = $this->loadEntityByUuid($entityType, $uuid);
     if (!$entity instanceof ContentEntityInterface) {
       throw new \RuntimeException("{$entityType} with uuid {$uuid} can not have a label");
     }
@@ -237,4 +230,48 @@ class EntityContext extends RawDrupalContext {
     $entity->set($labelKey, $label);
     $entity->save();
   }
+
+  /**
+   * @param string $entityType
+   *   The entity type.
+   * @param string $uuid
+   *   The entity's uuid.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  private function loadEntityByUuid(string $entityType, string $uuid) {
+    $entityStorage = \Drupal::entityTypeManager()->getStorage($entityType);
+    $entities = $entityStorage->loadByProperties(['uuid' => $uuid]);
+    if (empty($entities)) {
+      throw new \RuntimeException("No {$entityType} with uuid {$uuid} could be found");
+    }
+
+    $entity = reset($entities);
+    return $entity;
+  }
+
+  /**
+   * @Given :entityType :uuid has empty :field
+   *
+   * @param string $entityType
+   *   The entity type.
+   * @param string $uuid
+   *   The entity's uuid.
+   * @param string $fieldName
+   *   The field name
+   *
+   * @throws \RuntimeException
+   */
+  public function entityTypeWithUuidHasEmptyField(string $entityType, string $uuid, string $fieldName): void {
+    $entity = $this->loadEntityByUuid($entityType, $uuid);
+    if (!$entity instanceof ContentEntityInterface) {
+      throw new \RuntimeException("{$entityType} with uuid {$uuid} can not have fields");
+    }
+
+    $entity->set($fieldName, null);
+    $entity->save();
+  }
+
 }
