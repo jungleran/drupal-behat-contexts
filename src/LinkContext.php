@@ -22,11 +22,13 @@ class LinkContext implements Context {
    * @Then I should see a link :label with url :url
    *
    * @param string $label
+   *   The link's label
    * @param string $url
+   *   The url as found in the href attribute of the link.
    *
    * @throws \RuntimeException
    */
-  public function assertLinkWithUrl(string $label, string $url): void {
+  public function assertNamedLinkWithUrl(string $label, string $url): void {
     /** @var \Behat\Mink\Element\NodeElement[] $links */
     $links = $this->getPage()->findAll('named', array('link', $label));
 
@@ -66,13 +68,15 @@ class LinkContext implements Context {
    * @Then I should not see the link :label with url :url
    *
    * @param string $label
+   *   The link's label.
    * @param string $url
+   *   The url as found in the href attribute of the link.
    *
-   * @throws \Exception
+   * @throws \RuntimeException
    */
-  public function assertNoLinkWithUrl(string $label, string $url): void {
+  public function assertNoNamedLinkWithUrl(string $label, string $url): void {
     try {
-      $this->assertLinkWithUrl($label, $url);
+      $this->assertNamedLinkWithUrl($label, $url);
     }
     catch (\RuntimeException $e) {
       // We're expecting an exception because we're negating the positive check.
@@ -80,6 +84,66 @@ class LinkContext implements Context {
     }
 
     throw new \RuntimeException("At least one '{$label}' link with url '{$url}' was found");
+  }
+
+  /**
+   * @Then I should see a link with url :url
+   *
+   * @param string $url
+   *   The url as found in the href attribute of the link.
+   *
+   * @throws \RuntimeException
+   */
+  public function assertLinkWithUrl(string $url): void {
+    /** @var \Behat\Mink\Element\NodeElement[] $links */
+    $links = $this->getPage()->findAll('css', "a[href='{$url}']");
+
+    if (empty($links)) {
+      throw new \RuntimeException("No link with url {$url} found on " . $this->getCurrentUrl());
+    }
+
+    $invisibleLinkFound = FALSE;
+    foreach ($links as $link) {
+      // We have found a matching link, but it may not be visible. We therefore
+      // check it's visibility to make sure.
+      try {
+        if (!$link->isVisible()) {
+          $invisibleLinkFound = TRUE;
+          continue;
+        }
+      }
+      catch (UnsupportedDriverActionException $exception) {
+        // Not all drivers support the isVisible method. We assume a link is
+        // visible if the method is not supported.
+      }
+
+      return;
+    }
+
+    if ($invisibleLinkFound) {
+      throw new \RuntimeException("Found a link with url {$url}, but it was invisible.");
+    }
+    throw new \RuntimeException("Found multiple links, but none with the url {$url}");
+  }
+
+  /**
+   * @Then I should not see a link with url :url
+   *
+   * @param string $url
+   *   The url as found in the href attribute of the link.
+   *
+   * @throws \RuntimeException
+   */
+  public function assertNoLinkWithUrl(string $url): void {
+    try {
+      $this->assertLinkWithUrl($url);
+    }
+    catch (\RuntimeException $e) {
+      // We're expecting an exception because we're negating the positive check.
+      return;
+    }
+
+    throw new \RuntimeException("At least one link with url '{$url}' was found");
   }
 
   /**
