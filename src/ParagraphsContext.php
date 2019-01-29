@@ -15,8 +15,7 @@ class ParagraphsContext implements Context {
   use UsesEntities;
 
   /**
-   * @Given :entityType with :fieldName :fieldValue has :paragraphsField containing
-   *   the following paragraphs:
+   * @Given :entityType with :fieldName :fieldValue has :paragraphsField containing the following paragraphs:
    *
    * @param string $entityType
    *   The entity type id.
