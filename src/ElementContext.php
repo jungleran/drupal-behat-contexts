@@ -173,7 +173,7 @@ class ElementContext implements Context {
   }
 
   /**
-   * @Then I should see the :locator element/
+   * @Then I should see the :locator element
    *
    * @param string $locator
    *   The css locator.
