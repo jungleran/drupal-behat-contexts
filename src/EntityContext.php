@@ -260,7 +260,7 @@ class EntityContext extends RawDrupalContext {
    * @param string $uuid
    *   The entity's uuid.
    * @param string $fieldName
-   *   The field name
+   *   The field name.
    *
    * @throws \RuntimeException
    */
@@ -271,6 +271,30 @@ class EntityContext extends RawDrupalContext {
     }
 
     $entity->set($fieldName, null);
+    $entity->save();
+  }
+
+  /**
+   * @Given :entityType :uuid has :field with value :value
+   *
+   * @param string $entityType
+   *   The entity type.
+   * @param string $uuid
+   *   The entity's uuid.
+   * @param string $fieldName
+   *   The field name.
+   * @param string $value
+   *   The field value.
+   *
+   * @throws \RuntimeException
+   */
+  public function entityTypeWithUuidHasFieldValue(string $entityType, string $uuid, string $fieldName, string $value): void {
+    $entity = $this->loadEntityByUuid($entityType, $uuid);
+    if (!$entity instanceof ContentEntityInterface) {
+      throw new \RuntimeException("{$entityType} with uuid {$uuid} can not have fields");
+    }
+
+    $entity->set($fieldName, $value);
     $entity->save();
   }
 
