@@ -6,6 +6,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Session;
+use DMore\ChromeDriver\ChromeDriver;
 use Drupal\DrupalExtension\Context\MinkContext;
 
 /**
@@ -58,7 +59,11 @@ class BrowserContext implements Context {
       return;
     }
 
-    if (!$this->getSession()->getDriver() instanceof Selenium2Driver) {
+    /** @var \Behat\MinkExtension\Context\MinkContext $minkContext */
+    $this->minkContext = $scope->getEnvironment()->getContext(MinkContext::class);
+
+    $driver = $this->getSession()->getDriver();
+    if (!$driver instanceof Selenium2Driver && !$driver instanceof ChromeDriver) {
       return;
     }
 
@@ -72,6 +77,9 @@ class BrowserContext implements Context {
    * @param int $height
    */
   public function resizeWindow(int $width, int $height): void {
+    if (!$this->getSession()->isStarted()) {
+      return;
+    }
     $this->getSession()->resizeWindow($width, $height, 'current');
   }
 
