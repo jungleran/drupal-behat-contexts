@@ -294,7 +294,26 @@ class EntityContext extends RawDrupalContext {
       throw new \RuntimeException("{$entityType} with uuid {$uuid} can not have fields");
     }
 
-    $entity->set($fieldName, $value);
+    // We need to pretend that we're processing an entity to be able to parse
+    // the entity fields correctly.
+    $mockEntity = (object) [
+      $entity->getEntityType()->getKey('bundle') => $entity->bundle(),
+      $fieldName => $value,
+    ];
+    $this->parseEntityFields($entityType, $mockEntity);
+
+    // AbstractCore::expandEntityFields is protected, but we need it to be able
+    // to correctly attach files to file fields. We'll therefore make it
+    // accessible using reflection and let it do it's thing.
+    $core = $this->getDriver()->getCore();
+    $reflectedCore = new \ReflectionClass($core);
+    $method = $reflectedCore->getMethod('expandEntityFields');
+    $method->setAccessible(true);
+    $method->invokeArgs($core, [$entityType, $mockEntity]);
+
+    // Now that we've parsed and expanded the field and it's value, we can set
+    // the result on the entity and save it.
+    $entity->set($fieldName, $mockEntity->{$fieldName});
     $entity->save();
   }
 

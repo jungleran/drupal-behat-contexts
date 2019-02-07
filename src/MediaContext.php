@@ -13,6 +13,7 @@ use Behat\Gherkin\Node\TableNode;
 class MediaContext implements Context {
 
   use UsesEntities;
+  use UsesFiles;
 
   /**
    * @Given :type media:
@@ -22,11 +23,38 @@ class MediaContext implements Context {
    *
    * @throws \Exception
    */
-  public function imageMedia(string $type, TableNode $tableNode): void {
-    foreach ($tableNode->getHash() as $nodeHash) {
-      $media = (object) $nodeHash;
+  public function givenMedia(string $type, TableNode $tableNode): void {
+    foreach ($tableNode->getHash() as $hash) {
+      $media = (object) $this->prepareHash($hash);
       $media->bundle = $type;
       $this->entityContext->createEntity('media', $media);
     }
+  }
+
+  /**
+   * @param $hash
+   *
+   * @return mixed
+   */
+  private function prepareHash($hash) {
+    foreach ($hash as $fieldName => $fieldValue) {
+      $sourcePath = $this->fileContext->getAbsolutePathForFile($fieldValue);
+      if (!\file_exists($sourcePath)) {
+        continue;
+      }
+
+      $fileName = \basename($sourcePath);
+      $uri = "public://{$fileName}";
+      try {
+        $file = $this->fileContext->loadFileEntityForUri($uri);
+      }
+      catch (\RuntimeException $exception) {
+        $file = $this->fileContext->fileExists($fieldValue);
+      }
+
+      $hash[$fieldName] = $uri;
+    }
+
+    return $hash;
   }
 }
