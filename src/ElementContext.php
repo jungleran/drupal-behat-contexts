@@ -293,6 +293,73 @@ class ElementContext implements Context {
   }
 
   /**
+   * @Then I should see a maximum of :count :locator element(s)
+   *
+   * @param int $count
+   *   Count.
+   * @param string $locator
+   *   Locator.
+   *
+   * @throws \RuntimeException
+   */
+  public function iShouldSeeMaximumOfElements(int $count, string $locator): void {
+    $timesFound = $this->countElements($locator);
+
+    if ($timesFound > $count) {
+      throw new \RuntimeException("Expected to find a maximum of {$count} {$locator} elements but found {$timesFound}");
+    }
+  }
+
+  /**
+   * @param string $locator
+   *   The locator.
+   *
+   * @return int
+   *   The number of elements found
+   */
+  private function countElements(string $locator): int {
+    /** @var \Behat\Mink\Element\NodeElement[] $items */
+    $items = $this->getPage()->findAll('css', $locator);
+    return \count($items);
+  }
+
+  /**
+   * @Then I should see a minimum of :count :locator element(s)
+   *
+   * @param int $count
+   *   Count.
+   * @param string $locator
+   *   Locator.
+   *
+   * @throws \RuntimeException
+   */
+  public function iShouldSeeMinimumOfElements(int $count, string $locator): void {
+    $timesFound = $this->countElements($locator);
+
+    if ($timesFound < $count) {
+      throw new \RuntimeException("Expected to find a minimum of {$count} {$locator} elements but found {$timesFound}");
+    }
+  }
+
+  /**
+   * @Then I should see exactly :count :locator element(s)
+   *
+   * @param int $count
+   *   Count.
+   * @param string $locator
+   *   Locator.
+   *
+   * @throws \RuntimeException
+   */
+  public function iShouldSeeExactlyElements(int $count, string $locator): void {
+    $timesFound = $this->countElements($locator);
+
+    if ($timesFound !== $count) {
+      throw new \RuntimeException("Expected to find exactly {$count} {$locator} elements but found {$timesFound}");
+    }
+  }
+
+  /**
    * @When I click the :locator element
    *
    * @param string $locator
