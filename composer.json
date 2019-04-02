@@ -11,7 +11,10 @@
         "psr-4": {"OrdinaDigitalServices\\": "src/"}
     },
     "suggest": {
-        "drupal/entityqueue": "Enables the use of the EntityQueueContext"
+        "drupal/entityqueue": "Enables the use of the EntityQueueContext",
+        "drupal/paragraphs": "Enables the use of the ParagraphsContext",
+        "drupal/profile": "Enables the use of the ProfileContext",
+        "drupal/search_api": "Enables the use of the SearchContext"
     },
     "require-dev": {
         "phpmd/phpmd": "^2.6"
