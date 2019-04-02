@@ -12,5 +12,8 @@
     },
     "suggest": {
         "drupal/entityqueue": "Enables the use of the EntityQueueContext"
+    },
+    "require-dev": {
+        "phpmd/phpmd": "^2.6"
     }
 }
