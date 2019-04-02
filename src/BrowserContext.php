@@ -36,11 +36,13 @@ class BrowserContext implements Context {
   /**
    * BrowserContext constructor.
    *
-   * @param bool $resizeOnScenarioStart
+   * @param bool $resizeOnStart
    * @param array $defaultWindowSize
+   *
+   * @SuppressWarnings("boolean")
    */
-  public function __construct(bool $resizeOnScenarioStart = TRUE, array $defaultWindowSize = []) {
-    $this->resizeOnScenarioStart = $resizeOnScenarioStart;
+  public function __construct(bool $resizeOnStart = TRUE, array $defaultWindowSize = []) {
+    $this->resizeOnScenarioStart = $resizeOnStart;
     if (isset($defaultWindowSize['height'])) {
       $this->defaultWindowHeight = $defaultWindowSize['height'];
     }

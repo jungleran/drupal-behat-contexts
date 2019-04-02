@@ -3,9 +3,7 @@
 namespace OrdinaDigitalServices;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
-use Drupal\DrupalExtension\Context\MinkContext;
 use Behat\Mink\Element\NodeElement;
 
 /**
@@ -14,6 +12,8 @@ use Behat\Mink\Element\NodeElement;
  * Provides steps to perform html element based assertions.
  *
  * @package OrdinaDigitalServices
+ *
+ * @SuppressWarnings("public")
  */
 class ElementContext implements Context {
 

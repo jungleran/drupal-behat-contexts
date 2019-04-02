@@ -18,10 +18,8 @@ class MenuContext implements Context {
 
   /**
    * @BeforeScenario
-   *
-   * @param \Behat\Behat\Hook\Scope\BeforeScenarioScope $scope
    */
-  public function startSession(BeforeScenarioScope $scope): void {
+  public function startSession(): void {
     $session = new Session();
     // The default session id causes issues with StrictSessionHandler.php
     // because it's either too long or contains invalid characters. Setting an

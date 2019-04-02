@@ -19,9 +19,9 @@ class EntityQueueContext implements Context {
   /**
    * @beforeFeature
    *
-   * @param \Behat\Behat\Hook\Scope\BeforeFeatureScope $scope
+   * @SuppressWarnings("static")
    */
-  public static function beforeFeature(BeforeFeatureScope $scope): void {
+  public static function beforeFeature(): void {
     if (!\Drupal::moduleHandler()->moduleExists('entityqueue')) {
       throw new \RuntimeException(self::class . 'does not work without the entity queue module');
     }
@@ -73,6 +73,7 @@ class EntityQueueContext implements Context {
    * @param string $queueId
    *
    * @return \Drupal\entityqueue\EntityQueueInterface
+   * @SuppressWarnings("static")
    */
   private function getEntityQueue(string $queueId): EntityQueueInterface {
     $queue = EntityQueue::load($queueId);
