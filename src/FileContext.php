@@ -70,11 +70,11 @@ class FileContext implements Context {
    *   When the file doesn't exist.
    */
   public function loadFileEntityForUri(string $uri) {
-    $existing_files = entity_load_multiple_by_properties('file', ['uri' => $uri]);
-    if (!count($existing_files)) {
+    $existingFiles = entity_load_multiple_by_properties('file', ['uri' => $uri]);
+    if (!count($existingFiles)) {
       throw new \RuntimeException("No file with {$uri} exists");
     }
-    return \reset($existing_files);
+    return \reset($existingFiles);
   }
 
 }

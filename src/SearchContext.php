@@ -14,6 +14,7 @@ class SearchContext implements Context {
 
   /**
    * @Given all content has been indexed
+   * @SuppressWarnings("static")
    */
   public function allContentIsIndexed(): void {
     if (!\Drupal::moduleHandler()->moduleExists('search_api')) {

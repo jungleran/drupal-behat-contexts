@@ -12,6 +12,8 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
  * Class EntityContext.
  *
  * Provides steps to add/edit/delete Drupal entities.
+ *
+ * @SuppressWarnings("coupling")
  */
 class EntityContext extends RawDrupalContext {
 
@@ -143,6 +145,7 @@ class EntityContext extends RawDrupalContext {
    *   The comment.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
+   * @SuppressWarnings("static")
    */
   private function commentCreate(array $entityData): CommentInterface {
     $comment = Comment::create($entityData);
