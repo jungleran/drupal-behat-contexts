@@ -1,5 +1,6 @@
 {
     "name": "jungleran/drupal-behat-contexts",
+    "type": "library",
     "description": "Additional behat contexts to be used with jhedstrom/drupalextension",
     "keywords": ["behat","drupal", "extension"],
     "license": "MIT",
