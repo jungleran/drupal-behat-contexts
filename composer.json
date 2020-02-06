@@ -5,7 +5,7 @@
     "keywords": ["behat","drupal", "extension"],
     "license": "MIT",
     "require": {
-        "drupal/drupal-extension": "^3.4"
+        "drupal/drupal-extension": "^4"
     },
     "autoload": {
         "psr-4": {"OrdinaDigitalServices\\": "src/"}
